@@ -12,7 +12,14 @@ public class FieldOfView : MonoBehaviour
 
     public LayerMask targetMask;
     public LayerMask obsticleMask;
+    [HideInInspector]
     public List<Transform> visibleTargets;
+
+    public float meshResolution;
+    private void Start()
+    {
+        StartCoroutine(FindTargetsWithDelay(0.2f));
+    }
     IEnumerator FindTargetsWithDelay(float delay)
     {
         while(true){
@@ -42,6 +49,25 @@ public class FieldOfView : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        DrawFieldOfView();
+    }
+
+    void DrawFieldOfView()
+    {
+        int stepCount = Mathf.RoundToInt(viewAngle * meshResolution);
+        float stepAngleSize = viewAngle / stepCount;
+        for (int i = 0; i <= stepCount; i++)
+        {
+            float angle = transform.eulerAngles.y - viewAngle / 2 + stepAngleSize * i;
+            Debug.DrawLine(transform.position, transform.position + DirectionFromAngle(angle, true) * viewRadius, Color.yellow);
+        }
+        for (int i = 0; i < visibleTargets.Count; i++)
+        {
+            Debug.DrawLine(transform.position, visibleTargets[i].position, Color.red);
+        }
+    }
 
     public Vector3 DirectionFromAngle(float angleInDegrees, bool angleIsGlobal)
     {
